@@ -62,8 +62,8 @@ export function InputArea() {
   }
 
   return (
-    <div className="border-t border-border bg-background px-4 py-4">
-      <div className="container mx-auto max-w-4xl">
+    <div className="border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-4 md:bg-background">
+      <div className="mx-auto max-w-4xl">
         <div className="flex items-end gap-2">
           <Textarea
             value={text}

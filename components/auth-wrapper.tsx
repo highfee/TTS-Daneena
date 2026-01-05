@@ -24,21 +24,23 @@ export function AuthWrapper() {
         <>
           <Sidebar />
           {isSidebarOpen && (
-            <div className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden" onClick={toggleSidebar} />
+            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:hidden" onClick={toggleSidebar} />
           )}
         </>
       )}
 
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col h-full overflow-hidden relative">
         <Header />
 
-        <main className="flex-1">
-          <div className="container mx-auto max-w-4xl h-full">
+        <main className="flex-1 overflow-y-auto pb-32 md:pb-0">
+          <div className="container mx-auto max-w-4xl">
             <MessageList />
           </div>
         </main>
 
-        <InputArea />
+        <div className="fixed bottom-0 left-0 right-0 z-30 md:relative md:bg-transparent">
+          <InputArea />
+        </div>
       </div>
     </div>
   )

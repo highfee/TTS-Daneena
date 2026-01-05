@@ -28,10 +28,10 @@ export function Header() {
                 <Menu className="h-5 w-5" />
               </Button>
             )}
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-slate-500 shadow-sm border border-white/10">
               <Sparkles className="h-4 w-4 text-white" />
             </div>
-            <h1 className="text-lg font-semibold shrink-0">EA-TTS</h1>
+            <h1 className="text-lg font-semibold shrink-0 tracking-tight">EA-TTS</h1>
           </div>
 
           <div className="flex items-center gap-2">
