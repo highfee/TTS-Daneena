@@ -41,6 +41,7 @@ interface TTSStore {
   setAIModel: (model: AIModel) => void
   toggleSidebar: () => void
   getActiveChat: () => Chat | undefined
+  clearChats: () => void
 }
 
 export const useTTSStore = create<TTSStore>()(
@@ -70,7 +71,6 @@ export const useTTSStore = create<TTSStore>()(
       },
 
       setActiveChat: (chatId) => {
-        console.log("[v0] Switching to chat:", chatId)
         set({ activeChatId: chatId })
       },
 
@@ -139,6 +139,9 @@ export const useTTSStore = create<TTSStore>()(
       getActiveChat: () => {
         const state = get()
         return state.chats.find((c) => c.id === state.activeChatId)
+      },
+      clearChats: () => {
+        set({ chats: [], activeChatId: null })
       },
     }),
     {

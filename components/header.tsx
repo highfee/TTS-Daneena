@@ -11,6 +11,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 export function Header() {
   const [showModelSelector, setShowModelSelector] = useState(false)
   const { user, openAuthDialog, logout } = useAuthStore()
+  // const clearChats = useTTSStore((state) => state.clearChats)
+
+  const handleLogout = () => {
+    // clearChats()
+    logout()
+  }
 
   return (
     <>
@@ -46,7 +52,7 @@ export function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem className="text-sm">{user.email}</DropdownMenuItem>
-                  <DropdownMenuItem onClick={logout} className="text-sm text-red-600">
+                  <DropdownMenuItem onClick={handleLogout} className="text-sm text-red-600">
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>

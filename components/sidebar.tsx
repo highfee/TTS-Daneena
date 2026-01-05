@@ -45,15 +45,15 @@ export function Sidebar() {
                   <div
                     key={chat.id}
                     className={cn(
-                      "group relative flex items-center gap-2 rounded-lg p-3 hover:bg-accent cursor-pointer",
+                      "group relative flex items-center gap-2 rounded-lg p-3 hover:bg-accent cursor-pointer transition-colors",
                       activeChatId === chat.id && "bg-accent",
                     )}
                     onClick={() => setActiveChat(chat.id)}
                   >
-                    <div className="flex flex-1 items-start gap-2">
+                    <div className="flex flex-1 items-start gap-2 overflow-hidden">
                       <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">{chat.title}</p>
+                        <p className="truncate text-sm font-medium leading-tight">{chat.title}</p>
                         <p className="text-xs text-muted-foreground">{chat.messages.length} messages</p>
                       </div>
                     </div>

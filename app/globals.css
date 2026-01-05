@@ -93,6 +93,11 @@
     @apply bg-background text-foreground;
   }
 
+  /* added pointer cursor for all buttons */
+  button {
+    cursor: pointer;
+  }
+
   /* Custom Scrollbar Styling */
   ::-webkit-scrollbar {
     width: 8px;

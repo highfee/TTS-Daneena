@@ -7,8 +7,10 @@ import { useEffect, useRef } from "react"
 import { User, Bot } from "lucide-react"
 
 export function MessageList() {
-  const getActiveChat = useTTSStore((state) => state.getActiveChat)
-  const activeChat = getActiveChat()
+  const activeChatId = useTTSStore((state) => state.activeChatId)
+  const chats = useTTSStore((state) => state.chats)
+  const activeChat = chats.find((c) => c.id === activeChatId)
+
   const messages = activeChat?.messages || []
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
