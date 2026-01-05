@@ -12,21 +12,8 @@ export const metadata: Metadata = {
   description: "Convert text to emotionally expressive speech using AI",
   generator: "v0.app",
   icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
+    icon: "/classic-studio-microphone.png",
+    apple: "/classic-studio-microphone.png",
   },
 }
 

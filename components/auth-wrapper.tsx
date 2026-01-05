@@ -10,7 +10,7 @@ import { useEffect } from "react"
 
 export function AuthWrapper() {
   const { user } = useAuthStore()
-  const clearChats = useTTSStore((state) => state.clearChats)
+  const { isSidebarOpen, toggleSidebar, clearChats } = useTTSStore()
 
   useEffect(() => {
     if (!user) {
@@ -19,10 +19,17 @@ export function AuthWrapper() {
   }, [user, clearChats])
 
   return (
-    <div className={user ? "grid h-screen grid-cols-[auto_1fr]" : "flex h-screen flex-col"}>
-      {user && <Sidebar />}
+    <div className={user ? "flex h-screen overflow-hidden" : "flex h-screen flex-col"}>
+      {user && (
+        <>
+          <Sidebar />
+          {isSidebarOpen && (
+            <div className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden" onClick={toggleSidebar} />
+          )}
+        </>
+      )}
 
-      <div className="flex min-w-0 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header />
 
         <main className="flex-1">
