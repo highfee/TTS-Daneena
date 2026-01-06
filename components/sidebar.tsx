@@ -3,91 +3,135 @@
 import { useTTSStore } from "@/store/use-tts-store"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { PanelLeft, Plus, MessageSquare, Trash2, MoreVertical } from "lucide-react"
+import { Plus, MessageSquare, Trash2, MoreVertical, ChevronRight } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function Sidebar() {
   const { chats, activeChatId, isSidebarOpen, createNewChat, setActiveChat, deleteChat, toggleSidebar } = useTTSStore()
 
-  return (
-    <aside
-      className={cn(
-        "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-background transition-all duration-300 md:relative md:translate-x-0",
-        isSidebarOpen ? "w-64 translate-x-0" : "w-14 -translate-x-full md:w-14 md:translate-x-0",
-      )}
-    >
-      {/* Toggle Button */}
-      <div className="flex h-14 items-center border-b px-2">
-        <Button variant="ghost" size="icon" className="h-10 w-10" onClick={toggleSidebar}>
-          <PanelLeft className="h-5 w-5" />
-        </Button>
-      </div>
+  const collapsed = !isSidebarOpen
 
-      {/* Sidebar Content - Only visible when open or on desktop collapsed state */}
-      <div className={cn("flex flex-1 flex-col overflow-hidden", !isSidebarOpen && "hidden md:flex")}>
-        {/* New Chat Button */}
-        <div className="border-b p-2">
-          <Button onClick={createNewChat} className={cn("w-full gap-2", !isSidebarOpen && "px-0")} size="sm">
-            <Plus className="h-4 w-4" />
-            {isSidebarOpen && <span>New Chat</span>}
+  return (
+    <TooltipProvider>
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-background transition-all duration-300 md:relative md:translate-x-0",
+          // Mobile: collapse with animation
+          isSidebarOpen ? "w-64 translate-x-0" : "w-14 -translate-x-full md:w-14 md:translate-x-0",
+          // Desktop: smooth width transition
+          "md:w-auto",
+        )}
+        style={!collapsed ? { width: "16rem" } : { width: "3.5rem" }}
+      >
+        {/* Header with Toggle Button */}
+        <div className="flex h-14 items-center justify-between border-b px-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10"
+            onClick={toggleSidebar}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <ChevronRight className={cn("h-5 w-5 transition-transform", collapsed ? "rotate-180" : "")} />
           </Button>
         </div>
 
-        {/* Chat List */}
-        <ScrollArea className="flex-1">
-          <div className="space-y-1 p-2">
-            {chats.length === 0 ? (
-              <div className="py-8 text-center text-sm text-muted-foreground">No chats yet</div>
+        {/* Sidebar Content */}
+        <div className={cn("flex flex-1 flex-col overflow-hidden", collapsed && "hidden md:flex")}>
+          {/* New Chat Button */}
+          <div className="border-b p-2">
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button onClick={createNewChat} variant="default" size="icon" className="h-10 w-10">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">New Chat</TooltipContent>
+              </Tooltip>
             ) : (
-              chats.map((chat) => (
-                <div
-                  key={chat.id}
-                  className={cn(
-                    "group relative flex items-center gap-2 rounded-lg p-3 hover:bg-accent cursor-pointer transition-colors",
-                    activeChatId === chat.id && "bg-accent",
-                  )}
-                  onClick={() => setActiveChat(chat.id)}
-                >
-                  <div className="flex flex-1 items-start gap-2 overflow-hidden">
-                    <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium leading-tight">{chat.title}</p>
-                      <p className="text-xs text-muted-foreground">{chat.messages.length} messages</p>
-                    </div>
-                  </div>
-
-                  {/* Delete Button */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        className="text-destructive"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          deleteChat(chat.id)
-                        }}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              ))
+              <Button onClick={createNewChat} className="w-full gap-2" size="sm">
+                <Plus className="h-4 w-4" />
+                <span>New Chat</span>
+              </Button>
             )}
           </div>
-        </ScrollArea>
-      </div>
-    </aside>
+
+          {/* Chat List */}
+          <ScrollArea className="flex-1">
+            <div className={cn("space-y-1", collapsed ? "p-1" : "p-2")}>
+              {chats.length === 0 ? (
+                <div className={cn("text-center text-muted-foreground", collapsed ? "py-4 text-xs" : "py-8 text-sm")}>
+                  {collapsed ? "No chats" : "No chats yet"}
+                </div>
+              ) : (
+                chats.map((chat) => (
+                  <Tooltip key={chat.id}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={cn(
+                          "group relative flex items-center gap-2 rounded-lg p-3 hover:bg-accent cursor-pointer transition-colors",
+                          activeChatId === chat.id && "bg-accent",
+                          collapsed && "justify-center p-2",
+                        )}
+                        onClick={() => setActiveChat(chat.id)}
+                      >
+                        {collapsed ? (
+                          <MessageSquare className="h-5 w-5 shrink-0 text-muted-foreground" />
+                        ) : (
+                          <>
+                            <div className="flex flex-1 items-start gap-2 overflow-hidden">
+                              <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-medium leading-tight">{chat.title}</p>
+                                <p className="text-xs text-muted-foreground">{chat.messages.length} messages</p>
+                              </div>
+                            </div>
+
+                            {/* Delete Button - Only visible when expanded */}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  className="text-destructive"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    deleteChat(chat.id)
+                                  }}
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </>
+                        )}
+                      </div>
+                    </TooltipTrigger>
+                    {collapsed && (
+                      <TooltipContent side="right" className="max-w-xs">
+                        <p className="max-w-xs">{chat.title}</p>
+                        <p className="text-xs text-muted-foreground">{chat.messages.length} messages</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      </aside>
+    </TooltipProvider>
   )
 }
