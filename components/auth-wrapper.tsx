@@ -24,7 +24,7 @@ export function AuthWrapper() {
         <>
           <Sidebar />
           {isSidebarOpen && (
-            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:hidden" onClick={toggleSidebar} />
+            <div className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm sm:hidden" onClick={toggleSidebar} />
           )}
         </>
       )}
