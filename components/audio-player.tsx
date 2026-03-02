@@ -197,8 +197,8 @@ export function AudioPlayer({ audioUrl, requestId }: AudioPlayerProps) {
 
       {/* Rating Dialog Overlay */}
       {showRating && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-lg bg-black/80 backdrop-blur-sm p-5">
-          <div className="w-full max-w-sm space-y-6 rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-xl">
+        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-lg bg-black/55 backdrop-blur-lg p-5">
+          <div className="w-full max-w-sm space-y-6 rounded-xl border border-white/10 bg-slate-950/35 p-6 shadow-xl backdrop-blur-xl">
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-white text-sm">Rate this voice</h4>
               <button
