@@ -17,15 +17,17 @@ export const metadata: Metadata = {
   },
 }
 
+import { ClientLayout } from "@/components/client-layout"
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        {children}
+        <ClientLayout>{children}</ClientLayout>
         <Analytics />
       </body>
     </html>

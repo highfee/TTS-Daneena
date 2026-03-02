@@ -1,26 +1,95 @@
-"use client"
+"use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { X, Phone } from "lucide-react"
-import { useAuthStore } from "@/store/use-auth-store"
-import { useState } from "react"
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { X, Phone, Loader, Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/use-auth-store";
+import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 export function AuthDialog() {
-  const { isAuthDialogOpen, closeAuthDialog, setUser } = useAuthStore()
-  const [email, setEmail] = useState("")
+  const { isAuthDialogOpen, closeAuthDialog, setUser } = useAuthStore();
 
-  const handleContinue = () => {
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showTokenInput, setShowTokenInput] = useState(false);
+  const [token, setToken] = useState("");
+
+  const handleContinue = async () => {
     if (email) {
-      // Mock authentication - replace with real auth
-      setUser({
-        id: Math.random().toString(36).substr(2, 9),
-        email: email,
-        name: email.split("@")[0],
-      })
+      setError("");
+      setLoading(true);
+      try {
+        const res = await fetch("/api/auth/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+
+        setLoading(false);
+        if (!res.ok) {
+          setError(data.detail || "An error occurred. Please try again.");
+          console.log(error);
+          return;
+        }
+
+        setShowTokenInput(true);
+        toast({
+          title: "Token sent",
+          description: "A verification token has been sent to your email.",
+        });
+      } catch (error) {
+        setLoading(false);
+        setError("An error occurred. Please try again.");
+      }
     }
-  }
+  };
+
+  const handleVerifyToken = async () => {
+    if (email && token) {
+      setError("");
+      setLoading(true);
+      try {
+        const res = await fetch("/api/auth/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, token }),
+        });
+        const data = await res.json();
+        setLoading(false);
+        if (!res.ok) {
+          setError(data.detail || "Invalid token. Please try again.");
+          return;
+        }
+
+        console.log("Auth verify response:", data);
+        // Save user data and token
+        setUser({
+          id: data.user_id || Math.random().toString(36).substr(2, 9),
+          email,
+          name: email.split("@")[0],
+          accessToken: data.access_token || data.accessToken, // Flexible for case differences
+        });
+
+        toast({
+          title: "Login successful",
+          description: "You have been logged in successfully.",
+        });
+
+        closeAuthDialog();
+        setEmail("");
+        setToken("");
+        setShowTokenInput(false);
+      } catch (error) {
+        console.error("Error during token verification:", error);
+        setError("An error occurred. Please try again.");
+        setLoading(false);
+      }
+    }
+  };
 
   const handleOAuthLogin = (provider: string) => {
     // Mock OAuth login - replace with real OAuth
@@ -28,28 +97,36 @@ export function AuthDialog() {
       id: Math.random().toString(36).substr(2, 9),
       email: `user@${provider}.com`,
       name: `${provider} User`,
-    })
-  }
+      accessToken: `mock-${provider}-token-${Math.random().toString(36).substr(2, 9)}`,
+    });
+  };
 
   return (
     <Dialog open={isAuthDialogOpen} onOpenChange={closeAuthDialog}>
       <DialogContent className="max-w-md border-border/40 bg-[#2f2f2f] p-0 text-white sm:rounded-2xl">
         <div className="relative p-8">
-          <Button
+          {/* <Button
             variant="ghost"
             size="icon"
             className="absolute right-4 top-4 h-8 w-8 rounded-full hover:bg-white/10"
             onClick={closeAuthDialog}
           >
             <X className="h-4 w-4" />
-          </Button>
+          </Button> */}
 
           <div className="mb-8 text-center">
             <h2 className="mb-3 text-2xl font-semibold">Log in or sign up</h2>
             <p className="text-sm text-gray-400">
-              You'll get smarter responses and can upload files, images, and more.
+              You'll get smarter responses and can upload files, images, and
+              more.
             </p>
           </div>
+
+          {error && (
+            <div className="mb-4 rounded bg-red-500/20 p-3 text-sm text-red-400">
+              {error}
+            </div>
+          )}
 
           <div className="space-y-3">
             <Button
@@ -128,20 +205,69 @@ export function AuthDialog() {
               className="border-border/40 bg-transparent py-6 text-base placeholder:text-gray-500"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  handleContinue()
+                  handleContinue();
                 }
               }}
             />
 
-            <Button
-              className="w-full bg-white py-6 text-base font-medium text-black hover:bg-gray-200"
-              onClick={handleContinue}
-            >
-              Continue
-            </Button>
+            {showTokenInput && (
+              <div className="flex  items-center gap-1">
+                <Input
+                  type="text"
+                  placeholder="Enter the token sent to your email"
+                  value={token}
+                  onChange={(e) => setToken(e.target.value)}
+                  className="border-border/40 bg-transparent py-6 text-base placeholder:text-gray-500"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      // Handle token verification here
+                    }
+                  }}
+                />
+
+                <Button
+                  variant={"ghost"}
+                  className="min-h-full! hover:bg-transparent! text-sm  px-0"
+                  onClick={() => {
+                    setShowTokenInput(false);
+                    setToken("");
+                    handleContinue();
+                  }}
+                  disabled={loading}
+                >
+                  Resend Token
+                </Button>
+              </div>
+            )}
+
+            {showTokenInput ? (
+              <Button
+                className="w-full bg-white py-6 text-base font-medium text-black hover:bg-gray-200 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                onClick={handleVerifyToken}
+                disabled={loading || !token}
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Verify Token"
+                )}
+              </Button>
+            ) : (
+              <Button
+                className="w-full bg-white py-6 text-base font-medium text-black hover:bg-gray-200 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                onClick={handleContinue}
+                disabled={loading || !email}
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Continue with email"
+                )}
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

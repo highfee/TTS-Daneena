@@ -1,21 +1,24 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Settings, Sparkles, Menu } from "lucide-react"
+import { Settings, Sparkles, Menu, Maximize2, Minimize2 } from "lucide-react"
 import { ModelSelector } from "./model-selector"
 import { useState } from "react"
 import { useAuthStore } from "@/store/use-auth-store"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useTTSStore } from "@/store/use-tts-store"
+import { useRouter } from "next/navigation"
 
 export function Header() {
   const [showModelSelector, setShowModelSelector] = useState(false)
+  const router = useRouter()
   const { user, openAuthDialog, logout } = useAuthStore()
-  const toggleSidebar = useTTSStore((state) => state.toggleSidebar)
+  const { isZenMode, toggleZenMode, toggleSidebar } = useTTSStore()
 
   const handleLogout = () => {
     logout()
+    router.push("/")
   }
 
   return (
@@ -39,6 +42,18 @@ export function Header() {
               <Settings className="h-4 w-4" />
               AI Models
             </Button>
+
+            {user && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleZenMode} 
+                className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                title={isZenMode ? "Exit Fullscreen" : "Enter Fullscreen"}
+              >
+                {isZenMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              </Button>
+            )}
 
             {!user ? (
               <Button onClick={openAuthDialog} size="sm">

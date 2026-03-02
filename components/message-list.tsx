@@ -65,7 +65,7 @@ function MessageItem({ message }: { message: Message }) {
         {message.emotion && message.confidence && (
           <EmotionBadge emotion={message.emotion} confidence={message.confidence} />
         )}
-        {message.audioUrl && <AudioPlayer audioUrl={message.audioUrl} />}
+        {message.audioUrl && <AudioPlayer audioUrl={message.audioUrl} requestId={message.requestId} />}
       </div>
     </div>
   )

@@ -8,42 +8,77 @@ import { Textarea } from "@/components/ui/textarea"
 import { useTTSStore } from "@/store/use-tts-store"
 import { SendHorizontal, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation"
+import { useAuthStore } from "@/store/use-auth-store"
+import { apiFetch } from "@/lib/api-fetch"
 
 export function InputArea() {
   const [text, setText] = useState("")
-  const { addMessage, setProcessing, isProcessing, createNewChat, activeChatId } = useTTSStore()
+  const { addMessage, setProcessing, isProcessing, activeChatId, persistChat, createNewChat } = useTTSStore()
   const { toast } = useToast()
+  const { user } = useAuthStore()
+  const router = useRouter()
 
   const handleSubmit = async () => {
     if (!text.trim() || isProcessing) return
 
-    if (!activeChatId) {
-      createNewChat()
-    }
-
-    // Add user message
-    addMessage({ type: "user", text })
+    let chatId = activeChatId
 
     setProcessing(true)
 
-    try {
-      // TODO: Replace with actual API call
-      // Simulating API call for demo purposes
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+    // If no active chat, create one
+    if (!chatId) {
+      const title = text.slice(0, 30) + (text.length > 30 ? "..." : "")
+      
+      if (user) {
+        // Authenticated users: persist to backend
+        chatId = await persistChat(title)
+        if (!chatId) {
+          setProcessing(false)
+          return
+        }
+        // Navigate to the new chat URL
+        router.push(`/chat/${chatId}`)
+      } else {
+        // Guest users: create local-only chat
+        createNewChat(title)
+        // Get the newly created local chatId from store
+        chatId = useTTSStore.getState().activeChatId
+      }
+    }
 
-      // Mock response - Replace with actual API response
-      const mockEmotions: Array<"happy" | "sad" | "neutral"> = ["happy", "sad", "neutral"]
-      const randomEmotion = mockEmotions[Math.floor(Math.random() * mockEmotions.length)]
+    // Add user message to the (now guaranteed) active chat
+    addMessage({ type: "user", text })
+
+    try {
+      const response = await apiFetch("/api/tts/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,
+          chat_id: user ? chatId : null,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to call TTS API")
+      }
+
+      const data = await response.json()
 
       addMessage({
+        id: data.id,
         type: "system",
-        emotion: randomEmotion,
-        confidence: 0.75 + Math.random() * 0.25,
-        audioUrl: "/placeholder-audio.mp3", // Replace with actual audio URL from API
+        text: data.input_text,
+        emotion: data.emotion as "happy" | "sad" | "neutral",
+        confidence: data.confidence,
+        audioUrl: data.audio_url,
+        requestId: data.id,
       })
 
       setText("")
     } catch (error) {
+      console.error("TTS Error:", error)
       toast({
         title: "Error",
         description: "Failed to generate speech. Please try again.",

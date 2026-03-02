@@ -3,13 +3,36 @@
 import { useTTSStore } from "@/store/use-tts-store"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Plus, MessageSquare, Trash2, MoreVertical, ChevronRight } from "lucide-react"
+import { Plus, MessageSquare, Trash2, MoreVertical, ChevronRight, BarChart3 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useEffect } from "react"
+import Link from "next/link"
+import { useRouter, usePathname } from "next/navigation"
+import { useAuthStore } from "@/store/use-auth-store"
 
 export function Sidebar() {
-  const { chats, activeChatId, isSidebarOpen, createNewChat, setActiveChat, deleteChat, toggleSidebar } = useTTSStore()
+  const { chats, activeChatId, isSidebarOpen, persistChat, createNewChat, setActiveChat, deleteChat, toggleSidebar, fetchChats } = useTTSStore()
+  const { user } = useAuthStore()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  useEffect(() => {
+    if (user) {
+      fetchChats()
+    }
+  }, [user, fetchChats])
+
+  const handleNewChat = () => {
+    setActiveChat("")
+    router.push("/")
+  }
+
+  const handleSelectChat = (chatId: string) => {
+    setActiveChat(chatId)
+    router.push(`/chat/${chatId}`)
+  }
 
   const collapsed = !isSidebarOpen
 
@@ -38,6 +61,23 @@ export function Sidebar() {
           </Button>
         </div>
 
+        {/* Analytics Link - Quick Access */}
+        <div className={cn("border-b p-2", collapsed && "hidden md:block")}>
+            <Link href="/analytics">
+                <Button 
+                    variant="ghost" 
+                    className={cn(
+                        "w-full gap-2 justify-start hover:bg-blue-500/10 hover:text-blue-400 transition-all",
+                        pathname === "/analytics" && "bg-blue-500/10 text-blue-400"
+                    )} 
+                    size="sm"
+                >
+                    <BarChart3 className="h-4 w-4" />
+                    {!collapsed && <span className="font-semibold tracking-tight">System Analytics</span>}
+                </Button>
+            </Link>
+        </div>
+
         {/* Sidebar Content */}
         <div className={cn("flex flex-1 flex-col overflow-hidden", collapsed && "hidden md:flex")}>
           {/* New Chat Button */}
@@ -45,14 +85,14 @@ export function Sidebar() {
             {collapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button onClick={createNewChat} variant="default" size="icon" className="h-10 w-10">
+                  <Button onClick={handleNewChat} variant="default" size="icon" className="h-10 w-10">
                     <Plus className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">New Chat</TooltipContent>
               </Tooltip>
             ) : (
-              <Button onClick={createNewChat} className="w-full gap-2" size="sm">
+              <Button onClick={handleNewChat} className="w-full gap-2" size="sm">
                 <Plus className="h-4 w-4" />
                 <span>New Chat</span>
               </Button>
@@ -76,7 +116,7 @@ export function Sidebar() {
                           activeChatId === chat.id && "bg-accent",
                           collapsed && "justify-center p-2",
                         )}
-                        onClick={() => setActiveChat(chat.id)}
+                        onClick={() => handleSelectChat(chat.id)}
                       >
                         {collapsed ? (
                           <MessageSquare className="h-5 w-5 shrink-0 text-muted-foreground" />
@@ -85,8 +125,12 @@ export function Sidebar() {
                             <div className="flex flex-1 items-start gap-2 overflow-hidden">
                               <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                               <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-medium leading-tight">{chat.title}</p>
-                                <p className="text-xs text-muted-foreground">{chat.messages.length} messages</p>
+                                <p className="truncate text-sm font-semibold leading-tight text-foreground group-hover:text-blue-400 transition-colors">
+                                  {chat.title}
+                                </p>
+                                <p className="text-[10px] text-blue-400/60 font-medium uppercase tracking-wider">
+                                  {chat.messages.length} messages
+                                </p>
                               </div>
                             </div>
 
@@ -105,9 +149,13 @@ export function Sidebar() {
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem
                                   className="text-destructive"
-                                  onClick={(e) => {
+                                  onClick={async (e) => {
                                     e.stopPropagation()
-                                    deleteChat(chat.id)
+                                    const isActive = activeChatId === chat.id
+                                    await deleteChat(chat.id)
+                                    if (isActive) {
+                                      router.push("/")
+                                    }
                                   }}
                                 >
                                   <Trash2 className="mr-2 h-4 w-4" />
