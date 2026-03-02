@@ -125,7 +125,7 @@ export function Sidebar() {
                             <div className="flex flex-1 items-start gap-2 overflow-hidden">
                               <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                               <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-semibold leading-tight text-foreground group-hover:text-blue-400 transition-colors">
+                                <p className="truncate text-sm font-semibold leading-tight text-foreground group-hover:text-blue-400 transition-colors max-w-full">
                                   {chat.title}
                                 </p>
                                 <p className="text-[10px] text-blue-400/60 font-medium uppercase tracking-wider">
