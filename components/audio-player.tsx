@@ -26,9 +26,9 @@ function StarRating({
   const [hovered, setHovered] = useState(0)
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">{label}</span>
-      <div className="flex gap-1">
+      <div className="flex items-center gap-1.5">
         {Array.from({ length: max }).map((_, i) => {
           const starVal = i + 1
           const filled = hovered ? starVal <= hovered : starVal <= value
@@ -39,18 +39,18 @@ function StarRating({
               onMouseEnter={() => setHovered(starVal)}
               onMouseLeave={() => setHovered(0)}
               onClick={() => onChange(starVal)}
-              className="focus:outline-none transition-transform hover:scale-125"
+              className="rounded-md p-1 focus:outline-none transition-transform hover:scale-110"
             >
               <Star
                 className={cn(
-                  "h-6 w-6 transition-colors",
+                  "h-5 w-5 transition-colors",
                   filled ? "fill-amber-400 text-amber-400" : "fill-transparent text-slate-600"
                 )}
               />
             </button>
           )
         })}
-        <span className="ml-2 text-sm text-slate-400 self-center">
+        <span className="ml-2 text-sm text-slate-400">
           {(hovered || value) ? `${hovered || value}/${max}` : "—"}
         </span>
       </div>
@@ -197,20 +197,20 @@ export function AudioPlayer({ audioUrl, requestId }: AudioPlayerProps) {
 
       {/* Rating Dialog Overlay */}
       {showRating && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-lg bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xs space-y-5">
+        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-lg bg-black/80 backdrop-blur-sm p-5">
+          <div className="w-full max-w-sm space-y-6 rounded-xl border border-white/10 bg-slate-950/60 p-6 shadow-xl">
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-white text-sm">Rate this voice</h4>
               <button
                 onClick={() => setShowRating(false)}
-                className="text-slate-400 hover:text-white transition-colors"
+                className="rounded-md p-1 text-slate-400 hover:text-white transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {submitState === "success" ? (
-              <div className="flex flex-col items-center gap-2 py-4 text-emerald-400">
+              <div className="flex flex-col items-center gap-2 py-6 text-emerald-400">
                 <CheckCircle2 className="h-10 w-10" />
                 <p className="text-sm font-medium">Thanks for your feedback!</p>
               </div>
