@@ -1,5 +1,6 @@
 "use client"
 
+import { OAuthProviders } from "@/components/oauth-providers"
 import { Header } from "@/components/header"
 import { InputArea } from "@/components/input-area"
 import { Sidebar } from "@/components/sidebar"
@@ -21,6 +22,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   }, [user, clearChats])
 
   return (
+    <OAuthProviders>
     <div className={user ? "flex h-screen overflow-hidden" : "flex h-screen flex-col"}>
       {user && !isZenMode && (
         <>
@@ -49,5 +51,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       <AuthDialog />
       <Toaster />
     </div>
+    </OAuthProviders>
   )
 }

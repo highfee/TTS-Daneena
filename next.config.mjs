@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000"
+
 const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
@@ -10,11 +12,11 @@ const nextConfig = {
     return [
       {
         source: "/api/tts/:path*",
-        destination: "http://localhost:8000/tts/:path*",
+        destination: `${BACKEND_URL}/tts/:path*`,
       },
       {
         source: "/api/chats/:path*",
-        destination: "http://localhost:8000/chats/:path*",
+        destination: `${BACKEND_URL}/chats/:path*`,
       },
     ]
   },

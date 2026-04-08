@@ -1,6 +1,6 @@
 import type { EmotionType } from "@/store/use-tts-store"
 import { cn } from "@/lib/utils"
-import { Smile, Frown, Minus } from "lucide-react"
+import { Smile, Frown, Minus, Flame, ShieldAlert, Zap } from "lucide-react"
 
 interface EmotionBadgeProps {
   emotion: EmotionType
@@ -28,6 +28,27 @@ const emotionConfig = {
     bgColor: "bg-gray-500/10",
     borderColor: "border-gray-500/20",
     icon: Minus,
+  },
+  angry: {
+    label: "Angry",
+    color: "text-red-600 dark:text-red-400",
+    bgColor: "bg-red-500/10",
+    borderColor: "border-red-500/20",
+    icon: Flame,
+  },
+  fear: {
+    label: "Fear",
+    color: "text-purple-600 dark:text-purple-400",
+    bgColor: "bg-purple-500/10",
+    borderColor: "border-purple-500/20",
+    icon: ShieldAlert,
+  },
+  surprise: {
+    label: "Surprise",
+    color: "text-amber-600 dark:text-amber-400",
+    bgColor: "bg-amber-500/10",
+    borderColor: "border-amber-500/20",
+    icon: Zap,
   },
 }
 

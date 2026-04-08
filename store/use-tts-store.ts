@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware"
 import { useAuthStore } from "./use-auth-store"
 import { apiFetch } from "@/lib/api-fetch"
 
-export type EmotionType = "happy" | "sad" | "neutral"
+export type EmotionType = "happy" | "sad" | "neutral" | "angry" | "fear" | "surprise"
 
 export interface Message {
   id: string
