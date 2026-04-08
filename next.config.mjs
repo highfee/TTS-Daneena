@@ -11,12 +11,20 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/tts/:path*",
-        destination: `${BACKEND_URL}/tts/:path*`,
+        source: "/api/tts",
+        destination: `${BACKEND_URL}/tts`,
       },
       {
-        source: "/api/chats/:path*",
-        destination: `${BACKEND_URL}/chats/:path*`,
+        source: "/api/tts/:path+",
+        destination: `${BACKEND_URL}/tts/:path+`,
+      },
+      {
+        source: "/api/chats",
+        destination: `${BACKEND_URL}/chats`,
+      },
+      {
+        source: "/api/chats/:path+",
+        destination: `${BACKEND_URL}/chats/:path+`,
       },
     ]
   },
