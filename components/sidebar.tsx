@@ -96,25 +96,28 @@ export function Sidebar() {
         </div>
 
         {/* Analytics Link - Quick Access */}
-        <div className={cn("border-b p-2", collapsed && "hidden md:block")}>
-          <Link href="/analytics">
-            <Button
-              variant="ghost"
-              className={cn(
-                "w-full gap-2 justify-start hover:bg-blue-500/10 hover:text-blue-400 transition-all",
-                pathname === "/analytics" && "bg-blue-500/10 text-blue-400",
-              )}
-              size="sm"
-            >
-              <BarChart3 className="h-4 w-4" />
-              {!collapsed && (
-                <span className="font-semibold tracking-tight">
-                  System Analytics
-                </span>
-              )}
-            </Button>
-          </Link>
-        </div>
+
+        {user?.email === "maigidajehidaya@gmail.com" && (
+          <div className={cn("border-b p-2", collapsed && "hidden md:block")}>
+            <Link href="/analytics">
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full gap-2 justify-start hover:bg-blue-500/10 hover:text-blue-400 transition-all",
+                  pathname === "/analytics" && "bg-blue-500/10 text-blue-400",
+                )}
+                size="sm"
+              >
+                <BarChart3 className="h-4 w-4" />
+                {!collapsed && (
+                  <span className="font-semibold tracking-tight">
+                    System Analytics
+                  </span>
+                )}
+              </Button>
+            </Link>
+          </div>
+        )}
 
         {/* Sidebar Content */}
         <div
